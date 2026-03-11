@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Generated at runtime by app.py
+static/
+
+# Local environment files
+.env
+.venv/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db

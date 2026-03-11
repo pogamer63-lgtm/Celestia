@@ -1,13 +1,18 @@
-# Celestia Website (Static Multipage)
+# Celestia
 
-## Start lokal
+Premium Multipage Website fuer Heilsteine, eingebettet in Streamlit fuer einfaches Deployment.
+
+## Schnellstart (Streamlit)
 ```powershell
-cd C:\Users\001123470\pyton\Celestia
-python -m http.server 5500
+cd C:\Users\001123470\pyton\Celestia\Celestia
+pip install -r requirements.txt
+streamlit run app.py
 ```
 
-Dann im Browser:
-`http://localhost:5500/index.html`
+## Deployment
+- Streamlit Community Cloud
+- Main file: `app.py`
+- Abhaengigkeiten: `requirements.txt`
 
 ## Seiten
 - `index.html`
@@ -16,10 +21,3 @@ Dann im Browser:
 - `rituals.html`
 - `reviews.html`
 - `contact.html`
-
-## Features
-- Premium Layout (wie die urspruengliche Version)
-- Sprachumschaltung DE/EN oben rechts
-- Multipage Navigation
-- Animationen (Stars, Glow, Reveal, Tilt, Counter, Parallax)
-

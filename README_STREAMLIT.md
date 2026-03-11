@@ -3,7 +3,7 @@
 ## Lokal starten
 1. Terminal in den Projektordner:
    ```powershell
-   cd C:\Users\001123470\pyton\Celestia
+   cd C:\Users\001123470\pyton\Celestia\Celestia
    ```
 2. Abhaengigkeiten installieren:
    ```powershell
@@ -25,7 +25,8 @@
 2. In Streamlit Cloud "New app" waehlen.
 3. Repository verbinden.
 4. Als Main file `app.py` setzen.
-5. Deploy ausfuehren.
+5. Python Version 3.11 oder 3.12 verwenden.
+6. Deploy ausfuehren.
 
 ## Logo
 - Datei: `assets/celestia-logo.png`
