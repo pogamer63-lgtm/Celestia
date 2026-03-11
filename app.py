@@ -18,6 +18,7 @@ SOURCE_FILES = [
     "products.html",
     "rituals.html",
     "reviews.html",
+    "family.html",
     "contact.html",
     "styles.css",
     "script.js",
@@ -30,6 +31,7 @@ PAGE_MAP = {
     "products": "products.html",
     "rituals": "rituals.html",
     "reviews": "reviews.html",
+    "family": "family.html",
     "contact": "contact.html",
 }
 
@@ -39,6 +41,7 @@ FILE_TO_PAGE = {
     "products.html": "products",
     "rituals.html": "rituals",
     "reviews.html": "reviews",
+    "family.html": "family",
     "contact.html": "contact",
 }
 
