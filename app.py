@@ -44,6 +44,14 @@ FILE_TO_PAGE = {
 INTERNAL_FILES = tuple(FILE_TO_PAGE.keys())
 
 
+def build_static_assets_prefix() -> str:
+    base_url_path = st.get_option("server.baseUrlPath") or ""
+    base_url_path = str(base_url_path).strip("/")
+    if base_url_path:
+        return f"/{base_url_path}/app/static/assets/"
+    return "/app/static/assets/"
+
+
 def copy_if_changed(source: Path, destination: Path) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
     if not destination.exists():
@@ -130,8 +138,9 @@ def build_embedded_html(page_file: str) -> str:
         flags=re.IGNORECASE,
     )
 
-    html_content = html_content.replace('src="assets/', 'src="/app/static/assets/')
-    html_content = html_content.replace("src='assets/", "src='/app/static/assets/")
+    static_assets_prefix = build_static_assets_prefix()
+    html_content = html_content.replace('src="assets/', f'src="{static_assets_prefix}')
+    html_content = html_content.replace("src='assets/", f"src='{static_assets_prefix}")
     html_content = rewrite_internal_links(html_content)
 
     html_content = html_content.replace(
