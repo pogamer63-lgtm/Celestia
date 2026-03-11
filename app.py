@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import re
 from pathlib import Path
 from shutil import copy2
@@ -116,6 +117,17 @@ def rewrite_internal_links(html: str) -> str:
     return pattern.sub(_replace, html)
 
 
+@st.cache_data(show_spinner=False)
+def get_logo_data_uri(logo_mtime_ns: int) -> str | None:
+    _ = logo_mtime_ns
+    logo_path = ASSETS_DIR / "celestia-logo.png"
+    if not logo_path.exists():
+        return None
+
+    logo_b64 = base64.b64encode(logo_path.read_bytes()).decode("ascii")
+    return f"data:image/png;base64,{logo_b64}"
+
+
 def build_embedded_html(page_file: str) -> str:
     html_path = ROOT / page_file
     if not html_path.exists():
@@ -137,6 +149,18 @@ def build_embedded_html(page_file: str) -> str:
         html_content,
         flags=re.IGNORECASE,
     )
+
+    logo_path = ASSETS_DIR / "celestia-logo.png"
+    logo_data_uri = get_logo_data_uri(logo_path.stat().st_mtime_ns if logo_path.exists() else 0)
+    if logo_data_uri:
+        html_content = html_content.replace(
+            'src="assets/celestia-logo.png"',
+            f'src="{logo_data_uri}"',
+        )
+        html_content = html_content.replace(
+            "src='assets/celestia-logo.png'",
+            f"src='{logo_data_uri}'",
+        )
 
     static_assets_prefix = build_static_assets_prefix()
     html_content = html_content.replace('src="assets/', f'src="{static_assets_prefix}')
@@ -161,9 +185,10 @@ def get_embedded_html_cached(
     page_mtime_ns: int,
     css_mtime_ns: int,
     js_mtime_ns: int,
+    logo_mtime_ns: int,
 ) -> str:
     # The mtime arguments are cache keys to refresh immediately on file changes.
-    _ = (page_mtime_ns, css_mtime_ns, js_mtime_ns)
+    _ = (page_mtime_ns, css_mtime_ns, js_mtime_ns, logo_mtime_ns)
     return build_embedded_html(page_file)
 
 
@@ -181,8 +206,10 @@ lang = resolve_lang()
 page_path = ROOT / page_file
 css_path = ROOT / "styles.css"
 js_path = ROOT / "script.js"
+logo_path = ASSETS_DIR / "celestia-logo.png"
 css_mtime_ns = css_path.stat().st_mtime_ns if css_path.exists() else 0
 js_mtime_ns = js_path.stat().st_mtime_ns if js_path.exists() else 0
+logo_mtime_ns = logo_path.stat().st_mtime_ns if logo_path.exists() else 0
 
 for candidate_file in INTERNAL_FILES:
     candidate_path = ROOT / candidate_file
@@ -191,6 +218,7 @@ for candidate_file in INTERNAL_FILES:
         page_mtime_ns=candidate_path.stat().st_mtime_ns if candidate_path.exists() else 0,
         css_mtime_ns=css_mtime_ns,
         js_mtime_ns=js_mtime_ns,
+        logo_mtime_ns=logo_mtime_ns,
     )
 
 embedded_html = get_embedded_html_cached(
@@ -198,6 +226,7 @@ embedded_html = get_embedded_html_cached(
     page_mtime_ns=page_path.stat().st_mtime_ns if page_path.exists() else 0,
     css_mtime_ns=css_mtime_ns,
     js_mtime_ns=js_mtime_ns,
+    logo_mtime_ns=logo_mtime_ns,
 )
 
 query: dict[str, str] = {}
