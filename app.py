@@ -46,6 +46,10 @@ FILE_TO_PAGE = {
 }
 
 INTERNAL_FILES = tuple(FILE_TO_PAGE.keys())
+ASSET_SRC_PATTERN = re.compile(
+    r"""src=(["'])assets/([^"']+)\1""",
+    re.IGNORECASE,
+)
 
 
 def build_static_assets_prefix() -> str:
@@ -120,6 +124,40 @@ def rewrite_internal_links(html: str) -> str:
     return pattern.sub(_replace, html)
 
 
+def inline_svg_assets(html: str) -> str:
+    def _replace(match: re.Match[str]) -> str:
+        quote = match.group(1)
+        relative_path = match.group(2)
+        if not relative_path.lower().endswith(".svg"):
+            return match.group(0)
+
+        asset_path = ASSETS_DIR / relative_path
+        if not asset_path.exists() or not asset_path.is_file():
+            return match.group(0)
+
+        svg_data_uri = (
+            "data:image/svg+xml;base64,"
+            + base64.b64encode(asset_path.read_bytes()).decode("ascii")
+        )
+        return f"src={quote}{svg_data_uri}{quote}"
+
+    return ASSET_SRC_PATTERN.sub(_replace, html)
+
+
+def get_assets_mtime_ns() -> int:
+    if not ASSETS_DIR.exists():
+        return 0
+
+    latest = 0
+    for path in ASSETS_DIR.rglob("*"):
+        if not path.is_file():
+            continue
+        stat = path.stat().st_mtime_ns
+        if stat > latest:
+            latest = stat
+    return latest
+
+
 @st.cache_data(show_spinner=False)
 def get_logo_data_uri(logo_mtime_ns: int) -> str | None:
     _ = logo_mtime_ns
@@ -165,6 +203,8 @@ def build_embedded_html(page_file: str) -> str:
             f"src='{logo_data_uri}'",
         )
 
+    html_content = inline_svg_assets(html_content)
+
     static_assets_prefix = build_static_assets_prefix()
     html_content = html_content.replace('src="assets/', f'src="{static_assets_prefix}')
     html_content = html_content.replace("src='assets/", f"src='{static_assets_prefix}")
@@ -189,9 +229,10 @@ def get_embedded_html_cached(
     css_mtime_ns: int,
     js_mtime_ns: int,
     logo_mtime_ns: int,
+    assets_mtime_ns: int,
 ) -> str:
     # The mtime arguments are cache keys to refresh immediately on file changes.
-    _ = (page_mtime_ns, css_mtime_ns, js_mtime_ns, logo_mtime_ns)
+    _ = (page_mtime_ns, css_mtime_ns, js_mtime_ns, logo_mtime_ns, assets_mtime_ns)
     return build_embedded_html(page_file)
 
 
@@ -213,6 +254,7 @@ logo_path = ASSETS_DIR / "celestia-logo.png"
 css_mtime_ns = css_path.stat().st_mtime_ns if css_path.exists() else 0
 js_mtime_ns = js_path.stat().st_mtime_ns if js_path.exists() else 0
 logo_mtime_ns = logo_path.stat().st_mtime_ns if logo_path.exists() else 0
+assets_mtime_ns = get_assets_mtime_ns()
 
 for candidate_file in INTERNAL_FILES:
     candidate_path = ROOT / candidate_file
@@ -222,6 +264,7 @@ for candidate_file in INTERNAL_FILES:
         css_mtime_ns=css_mtime_ns,
         js_mtime_ns=js_mtime_ns,
         logo_mtime_ns=logo_mtime_ns,
+        assets_mtime_ns=assets_mtime_ns,
     )
 
 embedded_html = get_embedded_html_cached(
@@ -230,6 +273,7 @@ embedded_html = get_embedded_html_cached(
     css_mtime_ns=css_mtime_ns,
     js_mtime_ns=js_mtime_ns,
     logo_mtime_ns=logo_mtime_ns,
+    assets_mtime_ns=assets_mtime_ns,
 )
 
 query: dict[str, str] = {}
