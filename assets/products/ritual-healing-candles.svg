@@ -1,0 +1,27 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800' role='img' aria-label='Ritual Healing Candles'>
+  <defs>
+    <linearGradient id='bg' x1='0' y1='0' x2='1' y2='1'>
+      <stop offset='0%' stop-color='#631b1b'/>
+      <stop offset='100%' stop-color='#ad5b2c'/>
+    </linearGradient>
+    <radialGradient id='halo' cx='0.2' cy='0.1' r='0.9'>
+      <stop offset='0%' stop-color='rgba(255,235,170,0.45)'/>
+      <stop offset='100%' stop-color='rgba(255,235,170,0)'/>
+    </radialGradient>
+  </defs>
+  <rect width='1200' height='800' fill='url(#bg)'/>
+  <rect width='1200' height='800' fill='url(#halo)'/>
+  <g fill='none' stroke='rgba(255,220,145,0.45)' stroke-width='3'>
+    <path d='M80 730 C 300 590, 520 700, 760 560'/>
+    <path d='M250 760 C 480 630, 740 690, 1060 510'/>
+    <circle cx='980' cy='180' r='88'/>
+    <circle cx='220' cy='200' r='46'/>
+  </g>
+  <g fill='rgba(255,232,183,0.92)'>
+    <polygon points='180,620 260,360 340,620'/>
+    <polygon points='320,640 420,290 520,640'/>
+    <polygon points='500,650 620,250 740,650'/>
+  </g>
+  <text x='86' y='118' fill='#ffe7ac' font-family='Cinzel, serif' font-size='62' font-weight='700'>Ritual Healing Candles</text>
+  <text x='86' y='176' fill='#f6d68f' font-family='Manrope, sans-serif' font-size='34'>Intention candle collection</text>
+</svg>
